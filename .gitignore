@@ -1,0 +1,15 @@
+node_modules/
+.expo/
+dist/
+coverage/
+*.db
+*.db-journal
+.env
+.env.local
+.DS_Store
+npm-debug.log*
+*.tsbuildinfo
+server/data/*.db
+server/data/*.db-journal
+.expo-shared/
+web-build/
