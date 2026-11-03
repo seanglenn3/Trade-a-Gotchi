@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -27,6 +28,13 @@ import {
 
 const STORAGE_KEY = 'trade-a-gotchi-v1';
 
+export type CelebrationKind = 'hatch' | 'eat' | 'evolve' | 'win' | 'loss';
+
+export interface Celebration {
+  id: number;
+  kind: CelebrationKind;
+}
+
 interface SaveFile {
   disclaimerAccepted: boolean;
   bot: Bot | null;
@@ -38,6 +46,7 @@ interface GameApi {
   disclaimerAccepted: boolean;
   bot: Bot | null;
   notice: string | null;
+  celebration: Celebration | null;
   clearNotice: () => void;
   acceptDisclaimer: () => void;
   hatch: (name: string) => void;
@@ -59,6 +68,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
   const [bot, setBot] = useState<Bot | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [celebration, setCelebration] = useState<Celebration | null>(null);
+  const celebrationId = useRef(0);
+  const spark = useCallback((kind: CelebrationKind | null) => {
+    if (!kind) return;
+    celebrationId.current += 1;
+    setCelebration({ id: celebrationId.current, kind });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -91,17 +107,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const next = hatchBot(name);
     setBot(next);
     setNotice(`${next.name} hatched with a $5,000 paper account.`);
-  }, []);
+    spark('hatch');
+  }, [spark]);
 
   const loadDemo = useCallback(() => {
     setDisclaimerAccepted(true);
     setBot(createDemoBot());
     setNotice('Pip woke up already grown, holding a journal of pretend trades on the sample prices.');
-  }, []);
+    spark('evolve');
+  }, [spark]);
 
   const release = useCallback(() => {
     setBot(null);
     setNotice(null);
+    setCelebration(null);
   }, []);
 
   const saveRules = useCallback(
@@ -117,8 +136,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
             : 'Recipe saved.';
       setBot(updated.bot);
       setNotice(evolved ?? discipline);
+      spark(evolved ? 'evolve' : 'eat');
     },
-    [bot],
+    [bot, spark],
   );
 
   const feed = useCallback(
@@ -128,8 +148,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const evolved = evolutionNote(bot, fed.bot);
       setBot(fed.bot);
       setNotice(evolved ?? (fed.gainedXp > 0 ? `Yum. +${fed.gainedXp} XP.` : 'Already eaten.'));
+      spark(evolved ? 'evolve' : fed.gainedXp > 0 ? 'eat' : null);
     },
-    [bot],
+    [bot, spark],
   );
 
   const step = useCallback(
@@ -140,10 +161,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setNotice('The sample calendar is finished. Replay a window to practice that history again.');
         return;
       }
+      const evolved = evolutionNote(bot, next);
       setBot(next);
-      setNotice(evolutionNote(bot, next) ?? `${next.name} sat through ${days === 1 ? 'one market day' : `${days} market days`}.`);
+      setNotice(evolved ?? `${next.name} sat through ${days === 1 ? 'one market day' : `${days} market days`}.`);
+      spark(evolved ? 'evolve' : tradeReaction(bot, next));
     },
-    [bot, dataset.bars],
+    [bot, dataset.bars, spark],
   );
 
   const continueToEnd = useCallback(() => {
@@ -153,9 +176,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setNotice('Already at the end of the sample.');
       return;
     }
+    const evolved = evolutionNote(bot, next);
     setBot(next);
-    setNotice(evolutionNote(bot, next) ?? 'Fast-forwarded to the last sample day. The paper account was not reset.');
-  }, [bot, dataset.bars]);
+    setNotice(evolved ?? 'Fast-forwarded to the last sample day. The paper account was not reset.');
+    spark(evolved ? 'evolve' : tradeReaction(bot, next));
+  }, [bot, dataset.bars, spark]);
 
   const replay = useCallback(
     (sessions: number | 'all') => {
@@ -167,13 +192,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return;
       }
       const next = fastForwardBot(bot, dataset.bars, { reset: true, from: span.from, to: span.to });
+      const evolved = evolutionNote(bot, next);
       setBot(next);
       setNotice(
-        evolutionNote(bot, next) ??
-          `Replayed ${span.from} to ${span.to}. The paper account started over at $5,000. Rules stayed.`,
+        evolved ?? `Replayed ${span.from} to ${span.to}. The paper account started over at $5,000. Rules stayed.`,
       );
+      spark(evolved ? 'evolve' : tradeReaction(bot, next));
     },
-    [bot, dataset.bars],
+    [bot, dataset.bars, spark],
   );
 
   const rulePreview = useCallback(() => (bot ? previewRuleChange(bot) : null), [bot]);
@@ -185,6 +211,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       disclaimerAccepted,
       bot,
       notice,
+      celebration,
       clearNotice,
       acceptDisclaimer,
       hatch,
@@ -203,6 +230,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       disclaimerAccepted,
       bot,
       notice,
+      celebration,
       clearNotice,
       acceptDisclaimer,
       hatch,
@@ -224,6 +252,12 @@ export function useGame(): GameApi {
   const value = useContext(GameContext);
   if (!value) throw new Error('useGame must sit inside GameProvider.');
   return value;
+}
+
+function tradeReaction(before: Bot, after: Bot): CelebrationKind | null {
+  const fresh = after.portfolio.trades.slice(before.portfolio.trades.length);
+  if (fresh.length === 0) return null;
+  return fresh[fresh.length - 1].pnl > 0 ? 'win' : 'loss';
 }
 
 function evolutionNote(before: Bot, after: Bot): string | undefined {

@@ -91,7 +91,7 @@ Bots are stored in SQLite through Node’s built-in `node:sqlite` driver (`DATAB
 
 ## How the toy plays
 
-1. Accept the disclaimer and hatch an egg. The baby starts with a **$5,000 paper account**, a 20-day moving-average entry, a 5% stop, a 10% target, a 5-session max hold, and 20% sizing. The first recipe edit is free.
+1. Accept the disclaimer and hatch an egg. The baby starts with a **$5,000 paper account**, a 20-day moving-average entry, a 5% stop, a 10% target, a 5-session max hold, and 20% sizing. The first recipe edit is free. Tap the pet, drag it to play, or hold for a paper-tape peek. Wins drop coins. Evolutions throw gold sparkles. The sky shifts green or red with the last session.
 2. Rule cards are toggles, not code. Enabled entry cards must all agree. Any enabled exit can close the trade. Sizing is a percent of paper equity and never spends more cash than the bot has.
 3. **Next market day** walks the sample forward. **Fast-forward to the end** keeps going without resetting. **Replay** is a backtest over a past window: the account returns to $5,000, the rules stay, and leftover positions are closed at the final price so the score includes them.
 4. Fills are the next session’s open, so a signal cannot trade on a close it has not seen yet. A stop and a target in the same bar fill the stop. A gap fills at the open.

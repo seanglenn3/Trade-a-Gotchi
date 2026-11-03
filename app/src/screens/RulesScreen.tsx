@@ -209,7 +209,7 @@ function RuleCard({
           onPress={onToggle}
           style={[styles.toggle, enabled && unlocked && styles.toggleOn]}
         >
-          <Text style={styles.toggleText}>{!unlocked ? 'Locked' : enabled ? 'On' : 'Off'}</Text>
+          <Text style={[styles.toggleText, enabled && unlocked && styles.toggleTextOn]}>{!unlocked ? 'Locked' : enabled ? 'On' : 'Off'}</Text>
         </Pressable>
       </View>
       {unlocked ? children : <Text style={styles.lockNote}>Unlocks at {unlockStageFor(type)} stage.</Text>}
@@ -226,22 +226,30 @@ function cloneRules(rules: RuleSet): RuleSet {
 }
 
 const styles = StyleSheet.create({
-  lead: { color: theme.cream, textAlign: 'center', lineHeight: 20 },
-  section: { color: theme.ink, fontWeight: '900', fontSize: font.body },
-  group: { color: theme.shell, fontWeight: '900', fontSize: 18 },
-  hint: { color: theme.muted, fontSize: font.small, lineHeight: 18 },
+  lead: { color: theme.goldLight, fontFamily: font.sans, textAlign: 'center', lineHeight: 20 },
+  section: { color: theme.text, fontFamily: font.sansBold, fontSize: font.body },
+  group: { color: theme.gold, fontFamily: font.display, fontSize: 18 },
+  hint: { color: theme.muted, fontFamily: font.sans, fontSize: font.small, lineHeight: 18 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#EFE0C8' },
-  chipOn: { backgroundColor: theme.ink },
-  chipText: { color: theme.ink, fontWeight: '800' },
-  chipTextOn: { color: theme.cream },
-  rule: { backgroundColor: theme.cream, borderRadius: 18, padding: 14, gap: 10 },
-  locked: { opacity: 0.72 },
+  chip: { borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: theme.cardBorder },
+  chipOn: { backgroundColor: theme.gold, borderColor: theme.gold },
+  chipText: { color: theme.goldLight, fontFamily: font.sansBold },
+  chipTextOn: { color: theme.onGold },
+  rule: {
+    backgroundColor: theme.card,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: theme.cardBorder,
+    padding: 14,
+    gap: 10,
+  },
+  locked: { opacity: 0.62 },
   ruleHead: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
-  toggle: { backgroundColor: '#E7D7C4', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },
-  toggleOn: { backgroundColor: theme.shell },
-  toggleText: { fontWeight: '900', color: theme.ink },
-  lockNote: { color: theme.muted, fontWeight: '700' },
-  preview: { color: '#FFE08A', textAlign: 'center', lineHeight: 18 },
-  error: { color: '#FFB4B4', fontWeight: '700', textAlign: 'center' },
+  toggle: { backgroundColor: '#06281C', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: theme.line },
+  toggleOn: { backgroundColor: theme.gold, borderColor: theme.gold },
+  toggleText: { fontFamily: font.sansBold, color: theme.goldLight },
+  toggleTextOn: { color: theme.onGold },
+  lockNote: { color: theme.gold, fontFamily: font.sansBold },
+  preview: { color: theme.goldLight, fontFamily: font.sans, textAlign: 'center', lineHeight: 18 },
+  error: { color: theme.danger, fontFamily: font.sansBold, textAlign: 'center' },
 });

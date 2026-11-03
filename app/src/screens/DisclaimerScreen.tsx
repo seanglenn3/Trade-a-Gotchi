@@ -44,9 +44,16 @@ export function DisclaimerScreen() {
 }
 
 const styles = StyleSheet.create({
-  lead: { color: theme.cream, fontSize: font.body, textAlign: 'center', lineHeight: 22 },
-  card: { backgroundColor: theme.cream, borderRadius: 18, padding: 16, gap: 12 },
-  body: { color: theme.ink, fontSize: font.body, lineHeight: 22 },
+  lead: { color: theme.goldLight, fontFamily: font.sans, fontSize: font.body, textAlign: 'center', lineHeight: 22 },
+  card: {
+    backgroundColor: theme.card,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: theme.cardBorder,
+    padding: 16,
+    gap: 12,
+  },
+  body: { color: theme.text, fontFamily: font.sans, fontSize: font.body, lineHeight: 22 },
   checkRow: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
   box: {
     width: 28,
@@ -58,6 +65,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   boxOn: { backgroundColor: theme.shell },
-  tick: { color: theme.ink, fontWeight: '900' },
-  checkText: { color: theme.cream, flex: 1, fontSize: font.small, lineHeight: 18 },
+  tick: { color: theme.onGold, fontWeight: '900' },
+  checkText: { color: theme.text, fontFamily: font.sans, flex: 1, fontSize: font.small, lineHeight: 18 },
 });

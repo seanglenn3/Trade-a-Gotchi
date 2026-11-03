@@ -1,40 +1,40 @@
 import { ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { theme } from '@/theme';
+import { StyleSheet, Text, View } from 'react-native';
+import { font, theme } from '@/theme';
 
 export function Device({ children }: { children: ReactNode }) {
   return (
     <View style={styles.shell}>
-      <View style={styles.lcd}>{children}</View>
-      <View style={styles.keys}>
-        <View style={[styles.key, { backgroundColor: theme.pink }]} />
-        <View style={[styles.key, { backgroundColor: theme.teal }]} />
-        <View style={[styles.key, { backgroundColor: theme.ink }]} />
+      <View style={styles.corners}>
+        <Text style={styles.corner}>$</Text>
+        <Text style={styles.live}>● LIVE PAPER</Text>
       </View>
+      <View style={styles.lcd}>{children}</View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   shell: {
-    backgroundColor: theme.shell,
-    borderRadius: 36,
-    padding: 16,
-    gap: 14,
-    borderBottomWidth: 6,
-    borderBottomColor: theme.shellDark,
+    backgroundColor: 'rgba(4, 24, 18, 0.92)',
+    borderRadius: 28,
+    padding: 12,
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: theme.gold,
   },
+  corners: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 6 },
+  corner: { color: theme.gold, fontFamily: font.display, fontSize: 16 },
+  live: { color: theme.neon, fontFamily: font.sansBold, fontSize: 11, letterSpacing: 1 },
   lcd: {
-    backgroundColor: theme.lcd,
-    borderRadius: 24,
-    minHeight: 230,
+    backgroundColor: 'rgba(8, 48, 34, 0.72)',
+    borderRadius: 22,
+    minHeight: 300,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderWidth: 4,
-    borderColor: '#8FBF86',
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(61, 255, 154, 0.35)',
+    overflow: 'hidden',
   },
-  keys: { flexDirection: 'row', justifyContent: 'center', gap: 16, paddingBottom: 4 },
-  key: { width: 28, height: 28, borderRadius: 14 },
 });

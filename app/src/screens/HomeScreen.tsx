@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { formatMoney, presentBot } from '@trade-a-gotchi/engine';
-import { BotSprite } from '@/components/BotSprite';
 import { Device } from '@/components/Device';
+import { InteractivePet } from '@/components/InteractivePet';
 import { Banner, Button, Card, DisclaimerStrip, Screen, VitalBar, Wordmark } from '@/components/ui';
 import { confirmAction } from '@/confirm';
 import { percent, prettyDate, signedMoney } from '@/format';
+import { marketTone } from '@/marketTone';
 import { useGame } from '@/state/GameProvider';
 import { font, theme } from '@/theme';
 
@@ -24,8 +25,9 @@ export function HomeScreen() {
     if (ok) game.replay(sessions);
   }
 
+  const tone = marketTone(view.portfolio.equityCurve);
   return (
-    <Screen>
+    <Screen tone={tone}>
       <Wordmark />
       <View style={styles.stageRow}>
         <Text style={styles.stage}>
@@ -35,14 +37,24 @@ export function HomeScreen() {
       </View>
       {game.notice ? <Banner text={game.notice} onDismiss={game.clearNotice} /> : null}
       <Device>
-        <BotSprite stage={view.stage} mood={view.mood} />
-        <Text style={styles.name}>{view.name}</Text>
-        <Text style={styles.quip}>{view.quip}</Text>
+        <InteractivePet
+          stage={view.stage}
+          mood={view.mood}
+          name={view.name}
+          quip={view.quip}
+          effect={game.celebration}
+          stats={{
+            equity: formatMoney(stats.endingEquity),
+            winRate: stats.closedTrades === 0 ? 'no closes' : percent(stats.winRate, 0),
+            drawdown: percent(stats.maxDrawdown),
+          }}
+        />
       </Device>
+      <Text style={styles.hint}>Tap the pet, drag to play, hold for the tape.</Text>
       <Card>
-        <VitalBar label="Health" value={view.health} color={theme.good} />
-        <VitalBar label="Happiness" value={view.happiness} color={theme.pink} />
-        <VitalBar label="Discipline" value={view.discipline} color={theme.teal} />
+        <VitalBar label="Health" value={view.health} color={theme.neon} />
+        <VitalBar label="Happiness" value={view.happiness} color={theme.gold} />
+        <VitalBar label="Discipline" value={view.discipline} color={theme.goldLight} />
         {view.nextStage ? (
           <Text style={styles.hint}>
             Next: {view.nextStage.label}. Still needs {view.nextStage.unmet.slice(0, 3).join('; ')}.
@@ -96,15 +108,13 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   stageRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  stage: { color: theme.shell, fontWeight: '800' },
-  name: { color: theme.lcdInk, fontSize: 22, fontWeight: '900', marginTop: 4 },
-  quip: { color: theme.lcdInk, textAlign: 'center', marginTop: 4, lineHeight: 18, fontSize: font.small },
-  kicker: { color: theme.muted, fontWeight: '700', fontSize: font.small },
-  equity: { color: theme.ink, fontSize: 32, fontWeight: '900' },
-  pnl: { color: theme.ink, fontWeight: '700' },
-  meta: { color: theme.muted, fontSize: font.small, lineHeight: 18 },
-  section: { color: theme.ink, fontSize: 18, fontWeight: '900' },
-  hint: { color: theme.muted, fontSize: font.small, lineHeight: 18 },
-  journal: { color: theme.ink, fontSize: font.small, lineHeight: 18 },
-  sampleNote: { color: '#CDBBDE', fontSize: 12, lineHeight: 17, textAlign: 'center' },
+  stage: { color: theme.gold, fontFamily: font.display, fontSize: 14 },
+  kicker: { color: theme.muted, fontFamily: font.sansBold, fontSize: font.small },
+  equity: { color: theme.goldLight, fontFamily: font.display, fontSize: 34 },
+  pnl: { color: theme.text, fontFamily: font.sansBold },
+  meta: { color: theme.muted, fontFamily: font.sans, fontSize: font.small, lineHeight: 18 },
+  section: { color: theme.gold, fontFamily: font.display, fontSize: 18 },
+  hint: { color: theme.muted, fontFamily: font.sans, fontSize: font.small, lineHeight: 18 },
+  journal: { color: theme.text, fontFamily: font.sans, fontSize: font.small, lineHeight: 18 },
+  sampleNote: { color: theme.muted, fontFamily: font.sans, fontSize: 12, lineHeight: 17, textAlign: 'center' },
 });

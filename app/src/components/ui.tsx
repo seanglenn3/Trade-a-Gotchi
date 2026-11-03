@@ -2,15 +2,18 @@ import { ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DISCLAIMER } from '@trade-a-gotchi/engine';
-import { font, theme } from '@/theme';
+import type { MarketTone } from '@/marketTone';
+import { font, glow, theme } from '@/theme';
+import { MarketSky } from './MarketSky';
 
-export function Screen({ children }: { children: ReactNode }) {
+export function Screen({ children, tone = 'flat' }: { children: ReactNode; tone?: MarketTone }) {
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.screen}>
+      <MarketSky tone={tone} />
       <ScrollView
         contentContainerStyle={{
-          paddingTop: insets.top + 12,
+          paddingTop: insets.top + 36,
           paddingBottom: 28,
           paddingHorizontal: 16,
           alignItems: 'center',
@@ -23,7 +26,12 @@ export function Screen({ children }: { children: ReactNode }) {
 }
 
 export function Wordmark() {
-  return <Text style={styles.wordmark}>TRADE-A-GOTCHI</Text>;
+  return (
+    <View style={styles.markWrap}>
+      <Text style={styles.kicker}>PAPER DESK</Text>
+      <Text style={styles.wordmark}>TRADE-A-GOTCHI</Text>
+    </View>
+  );
 }
 
 export function DisclaimerStrip() {
@@ -53,6 +61,7 @@ export function Button({
   tone?: 'primary' | 'cream' | 'teal' | 'ink';
   disabled?: boolean;
 }) {
+  const light = tone === 'cream' || tone === 'ink';
   return (
     <Pressable
       accessibilityRole="button"
@@ -68,7 +77,7 @@ export function Button({
         pressed && !disabled && styles.pressed,
       ]}
     >
-      <Text style={[styles.buttonText, { color: tone === 'teal' || tone === 'ink' ? theme.cream : theme.ink }]}>{label}</Text>
+      <Text style={[styles.buttonText, { color: light ? (tone === 'ink' ? theme.danger : theme.gold) : theme.onGold }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -134,56 +143,63 @@ function clamp(value: number, min: number, max: number): number {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.bg },
   column: { width: '100%', maxWidth: 440, gap: 14 },
+  markWrap: { alignItems: 'center', gap: 2 },
+  kicker: { color: theme.neon, fontFamily: font.sansBold, fontSize: 11, letterSpacing: 3 },
   wordmark: {
-    color: theme.shell,
+    color: theme.gold,
+    fontFamily: font.display,
     fontSize: font.title,
-    fontWeight: '800',
-    letterSpacing: 1.5,
+    letterSpacing: 1.4,
     textAlign: 'center',
   },
-  disclaimer: { color: '#E7D7C8', fontSize: font.small, lineHeight: 18, textAlign: 'center' },
+  disclaimer: { color: theme.muted, fontFamily: font.sans, fontSize: font.small, lineHeight: 18, textAlign: 'center' },
   card: {
-    backgroundColor: theme.cream,
-    borderRadius: 18,
-    padding: 14,
+    backgroundColor: theme.card,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: theme.cardBorder,
+    padding: 16,
     gap: 10,
+    ...glow,
   },
   banner: {
-    backgroundColor: '#FFE08A',
-    borderRadius: 14,
+    backgroundColor: 'rgba(245, 196, 81, 0.16)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: theme.gold,
     paddingVertical: 10,
     paddingHorizontal: 12,
   },
-  bannerText: { color: theme.ink, fontSize: font.small, fontWeight: '700', lineHeight: 18 },
+  bannerText: { color: theme.goldLight, fontFamily: font.sansBold, fontSize: font.small, lineHeight: 18 },
   button: {
-    borderRadius: 14,
-    paddingVertical: 12,
+    borderRadius: 16,
+    paddingVertical: 13,
     paddingHorizontal: 14,
     alignItems: 'center',
   },
-  primary: { backgroundColor: theme.shell },
-  cream: { backgroundColor: theme.cream },
-  teal: { backgroundColor: theme.teal },
-  ink: { backgroundColor: theme.ink },
-  disabled: { opacity: 0.45 },
-  pressed: { opacity: 0.8 },
-  buttonText: { fontSize: font.body, fontWeight: '800' },
+  primary: { backgroundColor: theme.gold },
+  cream: { backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.gold },
+  teal: { backgroundColor: theme.neon },
+  ink: { backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.danger },
+  disabled: { opacity: 0.4 },
+  pressed: { transform: [{ scale: 0.98 }], opacity: 0.9 },
+  buttonText: { fontFamily: font.sansBold, fontSize: font.body },
   row: { flexDirection: 'row', justifyContent: 'space-between' },
-  vitalLabel: { color: theme.ink, fontWeight: '700', fontSize: font.small },
-  vitalValue: { color: theme.muted, fontSize: font.small, fontWeight: '700' },
-  track: { height: 12, borderRadius: 99, backgroundColor: '#E7D7C4', overflow: 'hidden' },
+  vitalLabel: { color: theme.text, fontFamily: font.sansBold, fontSize: font.small },
+  vitalValue: { color: theme.gold, fontFamily: font.sansBold, fontSize: font.small },
+  track: { height: 12, borderRadius: 99, backgroundColor: '#06281C', overflow: 'hidden' },
   fill: { height: 12, borderRadius: 99 },
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  stepperLabel: { color: theme.muted, fontSize: font.small, flex: 1 },
+  stepperLabel: { color: theme.muted, fontFamily: font.sans, fontSize: font.small, flex: 1 },
   stepperControls: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   step: {
     width: 36,
     height: 36,
-    borderRadius: 10,
-    backgroundColor: theme.ink,
+    borderRadius: 12,
+    backgroundColor: theme.gold,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepText: { color: theme.cream, fontSize: 20, fontWeight: '700' },
-  stepValue: { minWidth: 42, textAlign: 'center', color: theme.ink, fontWeight: '800', fontSize: font.body },
+  stepText: { color: theme.onGold, fontSize: 20, fontFamily: font.display },
+  stepValue: { minWidth: 42, textAlign: 'center', color: theme.goldLight, fontFamily: font.sansBold, fontSize: font.body },
 });

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { BotSprite } from '@/components/BotSprite';
 import { Device } from '@/components/Device';
+import { InteractivePet } from '@/components/InteractivePet';
 import { Button, DisclaimerStrip, Screen, Wordmark } from '@/components/ui';
 import { useGame } from '@/state/GameProvider';
 import { font, theme } from '@/theme';
@@ -18,8 +18,7 @@ export function HatchScreen() {
       <Wordmark />
       <Text style={styles.lead}>The egg rattles when it hears a name.</Text>
       <Device>
-        <BotSprite stage="egg" mood="sleepy" />
-        <Text style={styles.lcdText}>tap… tap…</Text>
+        <InteractivePet stage="egg" mood="sleepy" quip="Name me. The shell already rattles." effect={null} />
       </Device>
       {game.bot ? (
         <View style={styles.card}>
@@ -80,19 +79,27 @@ export function HatchScreen() {
 }
 
 const styles = StyleSheet.create({
-  lead: { color: theme.cream, textAlign: 'center', fontSize: font.body },
-  lcdText: { color: theme.lcdInk, fontWeight: '700', marginTop: 4 },
-  card: { backgroundColor: theme.cream, borderRadius: 18, padding: 14, gap: 10 },
+  lead: { color: theme.goldLight, textAlign: 'center', fontFamily: font.sans, fontSize: font.body },
+  card: {
+    backgroundColor: theme.card,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: theme.cardBorder,
+    padding: 14,
+    gap: 10,
+  },
   input: {
-    backgroundColor: theme.white,
-    borderRadius: 12,
+    backgroundColor: '#06281C',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: theme.gold,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 18,
-    color: theme.ink,
-    fontWeight: '700',
+    color: theme.goldLight,
+    fontFamily: font.display,
   },
-  error: { color: theme.bad, fontWeight: '700' },
-  hint: { color: theme.muted, fontSize: font.small, lineHeight: 18 },
-  ink: { color: theme.ink, fontSize: font.body, lineHeight: 22 },
+  error: { color: theme.danger, fontFamily: font.sansBold },
+  hint: { color: theme.muted, fontFamily: font.sans, fontSize: font.small, lineHeight: 18 },
+  ink: { color: theme.text, fontFamily: font.sans, fontSize: font.body, lineHeight: 22 },
 });
